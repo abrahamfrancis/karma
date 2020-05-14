@@ -14,7 +14,12 @@ const setAuthentication = function (userID, password, firstname, middlename, las
   // parameters to argon2 hashing function (strictly for password.length >= 12)
   // added safety factor 256
   return new Promise(((resolve, reject) => {
-    bcrypt.hash(password, saltRound).then((hash) => {
+    // bcrypt.hash(password, saltRound).then((hash) => {
+      const options = {
+        timeCost: 30, memoryCost: 2 ** 19, parallelism: 16, type: argon2.argon2i,
+      };
+
+      argon2.hash(password, options).then((hash) => {
       models.sequelize.query(`INSERT INTO people (first_name, middle_name, last_name, gender, date_of_birth, nationality, created_at, updated_at) VALUES ("${firstname}","${middlename}","${lastname}","${gender}","${dob}","${nationality}","${dateTime}","${dateTime}")`,
       // eslint-disable-next-line max-len
       // models.sequelize.query('SELECT JSON_CONTAINS((SELECT data FROM people_informations WHERE people_id = 1 AND slug_id = 1), \'["' + email + '"]\') as check_flag;',
